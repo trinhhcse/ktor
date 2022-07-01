@@ -50,11 +50,6 @@ buildscript {
         google()
         gradlePluginPortal()
         maven("https://maven.pkg.jetbrains.space/kotlin/p/kotlin/dev")
-        maven("https://maven.pkg.jetbrains.space/public/p/kotlinx-atomicfu/maven").credentials {
-            username = "margarita.bobova"
-            password =
-                "eyJhbGciOiJSUzUxMiJ9.eyJzdWIiOiIxcm1UZ20wbEFKaEoiLCJhdWQiOiJjaXJjbGV0LXdlYi11aSIsIm9yZ0RvbWFpbiI6InB1YmxpYyIsIm5hbWUiOiJtYXJnYXJpdGEuYm9ib3ZhIiwiaXNzIjoiaHR0cHM6XC9cL3B1YmxpYy5qZXRicmFpbnMuc3BhY2UiLCJwZXJtX3Rva2VuIjoiSVBwZlkwQ3M1cjUiLCJwcmluY2lwYWxfdHlwZSI6IlVTRVIiLCJpYXQiOjE2NDk5MjM2NDF9.olTvoKz6KSX1rMCkid3vCSvwy-95rQTYL9gVlj7ueudTEVGqXaq1tJc37FDnKL6i6oc26XLVDK0y4G_B7ZKJGoMh77nckx-XMmRxB4Q3LZY1cXo_Mt4zD9lPxfFAfHW9RboJFgNlLWzg3OVQvMwDgHetYhnuGmlTtzCKfCW3Ke4"
-        }
     }
 }
 
@@ -98,7 +93,7 @@ apply(from = "gradle/compatibility.gradle")
 plugins {
     id("org.jetbrains.dokka") version "1.6.21" apply false
     id("org.jetbrains.kotlinx.binary-compatibility-validator") version "0.10.0"
-    id("kotlinx-atomicfu") version(libs.versions.atomicfu.version) apply false
+    id("kotlinx-atomicfu") version "0.18.2" apply false
 }
 
 val kotlinVersion = libs.versions.kotlin.version.get()
@@ -117,7 +112,8 @@ allprojects {
         maven("https://maven.pkg.jetbrains.space/kotlin/p/kotlin/dev")
         maven("https://maven.pkg.jetbrains.space/public/p/kotlinx-atomicfu/maven").credentials {
             username = "alexander.likhachev"
-            password = "eyJhbGciOiJSUzUxMiJ9.eyJzdWIiOiIzWVdlRmUycmc1RWEiLCJhdWQiOiJjaXJjbGV0LXdlYi11aSIsIm9yZ0RvbWFpbiI6InB1YmxpYyIsIm5hbWUiOiJhbGV4YW5kZXIubGlraGFjaGV2IiwiaXNzIjoiaHR0cHM6XC9cL3B1YmxpYy5qZXRicmFpbnMuc3BhY2UiLCJwZXJtX3Rva2VuIjoiMWNtcGNEMG9UdTB2IiwicHJpbmNpcGFsX3R5cGUiOiJVU0VSIiwiaWF0IjoxNjUzNDAxNjQxfQ.Fy-QDPk6PVgC9E6d7vqexq4npZMUp1y2PHr7tMHrwQXPQ4lxSOGfnf9mgAZ7MWzv1PUhCik8vjwpsuEYq3TEGSjxJ_TsAuEJLitlgwPpFIjXwEZ4piSdLFZnilP4i_x1MlyvkFGE6EraOOoCf2CFoCm-Et3ApRbEbxmSM4E6TYE"
+            password =
+                "eyJhbGciOiJSUzUxMiJ9.eyJzdWIiOiIzWVdlRmUycmc1RWEiLCJhdWQiOiJjaXJjbGV0LXdlYi11aSIsIm9yZ0RvbWFpbiI6InB1YmxpYyIsIm5hbWUiOiJhbGV4YW5kZXIubGlraGFjaGV2IiwiaXNzIjoiaHR0cHM6XC9cL3B1YmxpYy5qZXRicmFpbnMuc3BhY2UiLCJwZXJtX3Rva2VuIjoiMWNtcGNEMG9UdTB2IiwicHJpbmNpcGFsX3R5cGUiOiJVU0VSIiwiaWF0IjoxNjUzNDAxNjQxfQ.Fy-QDPk6PVgC9E6d7vqexq4npZMUp1y2PHr7tMHrwQXPQ4lxSOGfnf9mgAZ7MWzv1PUhCik8vjwpsuEYq3TEGSjxJ_TsAuEJLitlgwPpFIjXwEZ4piSdLFZnilP4i_x1MlyvkFGE6EraOOoCf2CFoCm-Et3ApRbEbxmSM4E6TYE"
         }
     }
 
@@ -143,31 +139,17 @@ allprojects {
         }
     }
 
-    dependencies {
-        components {
-            withModule("org.jetbrains.kotlin:atomicfu") {
-                withVariant("runtimeElements") {
-                    val runtimeElementsVariant = this
-                    this@withModule.addVariant("runtimeJsIrElements") {
-                        attributes.attribute(
-                            org.jetbrains.kotlin.gradle.plugin.KotlinPlatformType.attribute,
-                            org.jetbrains.kotlin.gradle.plugin.KotlinPlatformType.js
-                        )
-                        attributes.attribute(
-                            org.jetbrains.kotlin.gradle.targets.js.KotlinJsCompilerAttribute.jsCompilerAttribute,
-                            org.jetbrains.kotlin.gradle.targets.js.KotlinJsCompilerAttribute.ir
-                        )
-                        attributes.attribute(Usage.USAGE_ATTRIBUTE, project.objects.named(Usage.JAVA_RUNTIME))
-                        runtimeElementsVariant.withFiles {
-                            val runtimeElementsFiles = this as org.gradle.api.internal.artifacts.repositories.resolver.DefaultMutableVariantFilesMetadata
-                            this@addVariant.withFiles {
-                                runtimeElementsFiles.files.forEach {
-                                    addFile(it.name)
-                                }
-                            }
-                        }
-                    }
-                }
+    configurations.all {
+        resolutionStrategy.dependencySubstitution.all {
+            val requestedComponent = requested
+            if (requestedComponent is ModuleComponentSelector &&
+                requestedComponent.group == "org.jetbrains.kotlin" &&
+                requestedComponent.module == "atomicfu"
+            ) {
+                    useTarget(
+                        "${requestedComponent.group}:kotlinx-atomicfu-runtime:$kotlinVersion",
+                        "Using proper kotlinx-atomicfu-runtime instead of Gradle plugin"
+                    )
             }
         }
     }
@@ -250,5 +232,4 @@ tasks.withType<DokkaMultiModuleTask> {
 }
 
 rootProject.plugins.withType<org.jetbrains.kotlin.gradle.targets.js.yarn.YarnPlugin> {
-    rootProject.the<org.jetbrains.kotlin.gradle.targets.js.yarn.YarnRootExtension>().ignoreScripts = false
-}
+    rootProject.the<org.jetbrains.kotlin.gradle.targets.js.yarn.YarnRootExtension>().ignoreScripts = false }
