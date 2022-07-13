@@ -41,6 +41,7 @@ kotlin {
                 "/usr/local/Cellar/curl/7.80.0/include/curl",
                 "/usr/local/Cellar/curl/7.80.0_1/include/curl",
                 "/usr/local/Cellar/curl/7.81.0/include/curl"
+                "/usr/local/Cellar/curl/7.84.0/include/curl"
             )
         }
 

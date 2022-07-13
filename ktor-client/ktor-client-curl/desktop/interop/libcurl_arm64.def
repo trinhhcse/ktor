@@ -14,6 +14,7 @@ compilerOpts.osx =           -I/opt/homebrew/opt/curl/include/curl \
                              -I/usr/bin/curl \
                              -I/usr/local/include/curl \
                              -I/usr/include/curl \
+                             -I/usr/local/Cellar/curl/7.84.0/include/curl \
                              -I/usr/local/Cellar/curl/7.83.1/include/curl \
                              -I/usr/local/Cellar/curl/7.81.0/include/curl \
                              -I/usr/local/Cellar/curl/7.80.0_1/include/curl \
