@@ -15,6 +15,7 @@ import kotlinx.cinterop.*
 import kotlinx.coroutines.*
 import platform.Foundation.*
 import kotlin.coroutines.*
+import io.ktor.http.*
 
 @OptIn(InternalAPI::class)
 internal class DarwinClientEngine(override val config: DarwinClientEngineConfig) : HttpClientEngineBase("ktor-darwin") {
@@ -41,29 +42,30 @@ internal class DarwinClientEngine(override val config: DarwinClientEngineConfig)
         data: HttpRequestData,
         callContext: CoroutineContext
     ): HttpResponseData {
-        val request = data.toNSUrlRequest()
-            .apply(config.requestConfig)
+//        val request = data.toNSUrlRequest()
+//            .apply(config.requestConfig)
 
-        val websocketSession = DarwinWebsocketSession(GMTDate(), callContext)
-        val session = NSURLSession.sessionWithConfiguration(
-            NSURLSessionConfiguration.defaultSessionConfiguration(),
-            websocketSession.delegate,
-            requestQueue
-        )
-        val task = session.webSocketTaskWithRequest(request)
-        websocketSession.task = task
+//        val websocketSession = DarwinWebsocketSession(GMTDate(), callContext)
+//        val session = NSURLSession.sessionWithConfiguration(
+//            NSURLSessionConfiguration.defaultSessionConfiguration(),
+//            websocketSession.delegate,
+//            requestQueue
+//        )
+//        val task = session.webSocketTaskWithRequest(request)
+//        websocketSession.task = task
+//
+//        launch(callContext) {
+//            task.resume()
+//        }
 
-        launch(callContext) {
-            task.resume()
-        }
-
-        return try {
-            websocketSession.response.await()
-        } catch (cause: CancellationException) {
-            if (task.state == NSURLSessionTaskStateRunning) {
-                task.cancel()
-            }
-            throw cause
-        }
+//        return try {
+//            websocketSession.response.await()
+//        } catch (cause: CancellationException) {
+//            if (task.state == NSURLSessionTaskStateRunning) {
+//                task.cancel()
+//            }
+//            throw cause
+//        }
+        return HttpResponseData(HttpStatusCode.OK, GMTDate(), Headers.Empty, HttpProtocolVersion.HTTP_1_1, "body", Job())
     }
 }
